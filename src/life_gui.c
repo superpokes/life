@@ -39,6 +39,12 @@ void draw_world(life_gui_t * life_gui, World * world) {
 
 
 void destroy_life_gui(life_gui_t * life_gui) {
-    // free stuff
+    if (life_gui->window == NULL) {
+        SDL_DestroyWindow(life_gui->window);
+    }
+    if (life_gui->renderer == NULL) {
+        SDL_DestroyRenderer(life_gui->renderer);
+    }
+    free(life_gui);
     SDL_Quit();
 }
