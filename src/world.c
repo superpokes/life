@@ -1,6 +1,6 @@
 #include "world.h"
 
-#define N_DIRECTIONS
+#define N_DIRECTIONS 8
 const char x_directions[N_DIRECTIONS] = { 0, 0, 1, 1, 1,-1,-1,-1 };
 const char y_directions[N_DIRECTIONS] = { 1,-1, 0, 1,-1, 0, 1,-1 };
 
