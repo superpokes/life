@@ -1,0 +1,9 @@
+cmake_minimum_required(VERSION 2.6.0)
+project(Life C)
+
+set(BIN_DIR ${Life_SOURCE_DIR}/bin)
+include_directories(/usr/include/SDL2/)
+add_executable(life.out src/life.c)
+target_link_libraries(life.out SDL2)
+
+install(TARGETS life.out RUNTIME DESTINATION ${BIN_DIR})
