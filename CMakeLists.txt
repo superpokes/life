@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.6.0)
 project(Life C)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c99 -pedantic")
+
 set(BIN_DIR ${Life_SOURCE_DIR}/bin)
 include_directories(/usr/include/SDL2/)
 add_executable(life.out src/life.c)
