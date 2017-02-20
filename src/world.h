@@ -21,6 +21,10 @@ World * init_world(size_t width, size_t height);
  */
 char get_creature(World * world, size_t x, size_t y);
 
+void set_creature(World * world, size_t x, size_t y, char value);
+
+void toggle_creature(World * world, size_t x, size_t y);
+
 /*
  * 0 completed correctly
  * 1 didn't

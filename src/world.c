@@ -32,6 +32,21 @@ char get_creature(World * world, size_t x, size_t y)
 }
 
 
+void set_creature(World * world, size_t x, size_t y, char value) {
+    if (x < world->w && y < world->h) {
+        world->land[x + y * world->w] = value;
+    }
+}
+
+
+void toggle_creature(World * world, size_t x, size_t y) {
+    if (x < world->w && y < world->h) {
+        world->land[x + y * world->w] = \
+            world->land[x + y * world->w] == SENTIENT ? INANIMATE : SENTIENT;
+    }
+}
+
+
 unsigned char adjacent_sentients(World * world, size_t x, size_t y)
 {
     int i_x = (int) x;
