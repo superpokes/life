@@ -1,15 +1,14 @@
-#include "stdio.h"
-#include "SDL.h"
+#include "world.h"
+#include "life_gui.h"
 
-int main()
+int main(int argc, char const * argv[])
 {
-    if (SDL_Init(SDL_INIT_VIDEO)) {
-        printf("SDL_Init Error: %s\n", SDL_GetError());
+    life_gui_t * stuff = init_life_gui(1000, 800);
+    if (stuff == NULL) {
+        destroy_life_gui(stuff);
         return 1;
     }
-
-    printf("Todo correcto\n");
-
-    SDL_Quit();
+    draw_world(stuff, NULL);
+    destroy_life_gui(stuff);
     return 0;
 }

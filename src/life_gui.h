@@ -2,10 +2,15 @@
 #define LIFE_GUI_H
 
 #include "SDL.h"
+#include "world.h"
+
+#define TILES_C 256;
 
 typedef struct {
     SDL_Window * window;
     SDL_Renderer * renderer;
+    SDL_Texture * tileset;
+    SDL_Rect * tiles_v;
 } life_gui_t;
 
 life_gui_t * init_life_gui();
