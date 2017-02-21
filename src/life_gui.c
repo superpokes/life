@@ -67,14 +67,23 @@ life_gui_t * init_life_gui(int window_width, int window_height)
 
 void draw_world(life_gui_t * life_gui, World * world) {
     SDL_RenderClear(life_gui->renderer);
-    SDL_Rect * position = (SDL_Rect *) malloc(sizeof(SDL_Rect));
-    position->x = 20;
-    position->y = 20;
-    position->w = 100;
-    position->h = 100;
-    SDL_RenderCopy(life_gui->renderer, life_gui->tileset, life_gui->tiles_v + 1, position);
+    for (int x = 0; x < world->w; x++) {
+        for (int y = world->h - 1; y >= 0; y--) {
+            SDL_Rect * position = (SDL_Rect *) malloc(sizeof(SDL_Rect));
+            position->x = x * 20; // Todo: tile_size variable
+            position->y = (world->h - y - 1) * 20;
+            position->w = 20;
+            position->h = 20;
+            SDL_RenderCopy(
+                life_gui->renderer,
+                life_gui->tileset,
+                life_gui->tiles_v + get_creature(world, x, y),
+                position
+            );
+            free(position);
+        }
+    }
     SDL_RenderPresent(life_gui->renderer);
-    SDL_Delay(10000);
 }
 
 

@@ -13,12 +13,14 @@ World * init_world(size_t width, size_t height)
 
     world->w = width;
     world->h = height;
-    world->land = (char *) malloc(width * height * sizeof(char));
+
+    world->land = (Entity *) malloc(width * height * sizeof(Entity));
     if (world->land == NULL) {
         return NULL;
     }
+
     for (int i = 0; i < width * height; i++) {
-        world->land[i] = 0;
+        world->land[i] = INANIMATE;
     }
 
     return world;
@@ -35,14 +37,16 @@ char get_creature(World * world, size_t x, size_t y)
 }
 
 
-void set_creature(World * world, size_t x, size_t y, char value) {
+void set_creature(World * world, size_t x, size_t y, char value)
+{
     if (x < world->w && y < world->h) {
         world->land[x + y * world->w] = value;
     }
 }
 
 
-void toggle_creature(World * world, size_t x, size_t y) {
+void toggle_creature(World * world, size_t x, size_t y)
+{
     if (x < world->w && y < world->h) {
         size_t mtx_i = x + (y * world->w);
         KILL(world->land[mtx_i]);
