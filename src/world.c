@@ -17,6 +17,9 @@ World * init_world(size_t width, size_t height)
     if (world->land == NULL) {
         return NULL;
     }
+    for (int i = 0; i < width * height; i++) {
+        world->land[i] = 0;
+    }
 
     return world;
 }
@@ -41,8 +44,8 @@ void set_creature(World * world, size_t x, size_t y, char value) {
 
 void toggle_creature(World * world, size_t x, size_t y) {
     if (x < world->w && y < world->h) {
-        world->land[x + y * world->w] = \
-            world->land[x + y * world->w] == SENTIENT ? INANIMATE : SENTIENT;
+        size_t mtx_i = x + (y * world->w);
+        KILL(world->land[mtx_i]);
     }
 }
 
