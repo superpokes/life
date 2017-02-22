@@ -2,7 +2,7 @@
 #define ATLAS_H
 
 #include "SDL.h"
-#include "stdint.h"
+#include "stdlib.h"
 
 /*
  * Abstracts the necessary operations to use a single texture for many tiles.
@@ -23,8 +23,8 @@ typedef struct {
 /*
  *
  */
-TextureAtlas * init_texture_atlas(SDL_Surface * surf, uint32_t tile_w,
-    uint32_t tile_h, uint32_t n_tiles_w, uint32_t n_tiles_h);
+TextureAtlas * init_texture_atlas(SDL_Renderer * rend, SDL_Surface * surf,
+    uint32_t tile_w, uint32_t tile_h, uint32_t n_tiles_x, uint32_t n_tiles_y);
 
 
 /*
