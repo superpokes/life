@@ -1,3 +1,7 @@
+// I Was Going To Use This
+// But it's a completely unnecessary complexity and
+// I just listened to another motivational Jonathan Blow talk.
+// Just Like Make Game.
 #include "atlas.h"
 #include "error_logs.h"
 
