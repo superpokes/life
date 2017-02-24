@@ -1,5 +1,6 @@
 #include "world.h"
 #include "life_gui.h"
+#include "stdio.h"
 
 int main(int argc, char const * argv[])
 {
@@ -15,6 +16,10 @@ int main(int argc, char const * argv[])
         printf("Error: init_world.\n");
         return 1;
     }
+    life_gui->viewport->x = 0;
+    life_gui->viewport->y = 0;
+    life_gui->viewport->w = 40;
+    life_gui->viewport->h = 30;
 
     toggle_creature(world, 1, 0);
     toggle_creature(world, 2, 1);
