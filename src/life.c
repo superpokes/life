@@ -1,6 +1,24 @@
+#include "stdlib.h"
+#include "stdio.h"
+
 #include "world.h"
 #include "life_gui.h"
-#include "stdio.h"
+
+#ifdef __MINGW32__
+#define EXIT_FUNCTION
+#include "conio.h"
+bool check_exit()
+{
+    if (kbhit() && getch() == 27) {
+        return true;
+    }
+    return false;
+}
+#endif /* __MINGW32__*/
+
+// #ifdef __linux__
+// Todo: check_exit()
+// #endif /* __linux__ */
 
 int main(int argc, char const * argv[])
 {
@@ -16,6 +34,7 @@ int main(int argc, char const * argv[])
         printf("Error: init_world.\n");
         return 1;
     }
+
     life_gui->viewport->x = 0;
     life_gui->viewport->y = 0;
     life_gui->viewport->w = 40;
@@ -31,10 +50,16 @@ int main(int argc, char const * argv[])
     for (int i = 0; i < 300; i++) {
         next_generation(world);
         draw_world(life_gui, world);
+        #ifdef EXIT_FUNCTION
+        if (check_exit()) {
+            break;
+        }
+        #endif
         SDL_Delay(100);
     }
 
     destroy_life_gui(life_gui);
     destruct_world(world);
+    SDL_Quit();
     return 0;
 }
