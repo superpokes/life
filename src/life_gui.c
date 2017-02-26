@@ -2,9 +2,9 @@
 #include "stdlib.h"
 #include "error_logs.h"
 
-life_gui_t * init_life_gui(int window_width, int window_height)
+LifeGUI * init_life_gui(int window_width, int window_height)
 {
-    life_gui_t * life_gui = (life_gui_t *) malloc(sizeof(life_gui_t));
+    LifeGUI * life_gui = (LifeGUI *) malloc(sizeof(LifeGUI));
     if (life_gui == NULL) {
         return NULL;
     }
@@ -39,7 +39,7 @@ life_gui_t * init_life_gui(int window_width, int window_height)
 }
 
 
-void draw_world(life_gui_t * g, World * w)
+void draw_world(LifeGUI * g, World * w)
 {
     SDL_RenderClear(g->renderer);
     for (int y = g->viewport->y; y < g->viewport->y + g->viewport->h; y++) {
@@ -64,7 +64,7 @@ void draw_world(life_gui_t * g, World * w)
 }
 
 
-void destroy_life_gui(life_gui_t * life_gui)
+void destroy_life_gui(LifeGUI * life_gui)
 {
     if (life_gui->window != NULL) {
         SDL_DestroyWindow(life_gui->window);

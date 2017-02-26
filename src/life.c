@@ -7,7 +7,7 @@
 
 int main(int argc, char const * argv[])
 {
-    life_gui_t * life_gui = init_life_gui(800, 600);
+    LifeGUI * life_gui = init_life_gui(800, 600);
     if (life_gui == NULL) {
         printf("Error: init_life_gui.\n");
         destroy_life_gui(life_gui);
@@ -50,7 +50,7 @@ int main(int argc, char const * argv[])
                     break;
             }
         }
-        
+
         SDL_Delay(100);
     }
 

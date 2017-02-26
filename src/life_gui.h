@@ -17,21 +17,21 @@ typedef struct {
     SDL_Window * window;
     SDL_Renderer * renderer;
     SDL_Rect * viewport;
-} life_gui_t;
+} LifeGUI;
 
 /*
  *
  */
-life_gui_t * init_life_gui();
+LifeGUI * init_life_gui();
 
 /*
  *
  */
-void draw_world(life_gui_t * life_gui, World * world);
+void draw_world(LifeGUI * life_gui, World * world);
 
 /*
  *
  */
-void destroy_life_gui(life_gui_t * life_gui);
+void destroy_life_gui(LifeGUI * life_gui);
 
 #endif /* end of include guard: LIFE_GUI_H */
