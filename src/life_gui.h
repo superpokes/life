@@ -12,22 +12,30 @@
  *     - viewport (SDL_Rect *): area of the world that will be shown
  *          (Todo: does it make sense to leave it here? when it also concerns
  *           things in the world. IDK.)
+ *     - world_w, world_h: useful for not letting the viewport go too far
  */
 typedef struct {
     SDL_Window * window;
     SDL_Renderer * renderer;
     SDL_Rect * viewport;
+    int _world_h;
+    int _world_w;
 } LifeGUI;
 
 /*
  *
  */
-LifeGUI * init_life_gui();
+LifeGUI * init_life_gui(int window_w, int window_h, int world_w, int world_h);
 
 /*
  *
  */
 void draw_world(LifeGUI * life_gui, World * world);
+
+/*
+ *
+ */
+void move_viewport(LifeGUI * lg, int x, int y);
 
 /*
  *

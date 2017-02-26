@@ -2,7 +2,7 @@
 #include "stdlib.h"
 #include "error_logs.h"
 
-LifeGUI * init_life_gui(int window_width, int window_height)
+LifeGUI * init_life_gui(int window_w, int window_h, int world_w, int world_h)
 {
     LifeGUI * life_gui = (LifeGUI *) malloc(sizeof(LifeGUI));
     if (life_gui == NULL) {
@@ -14,7 +14,7 @@ LifeGUI * init_life_gui(int window_width, int window_height)
         return NULL;
     }
 
-    life_gui->window = SDL_CreateWindow("Life ❤", 100, 100, window_width, window_height, SDL_WINDOW_SHOWN);
+    life_gui->window = SDL_CreateWindow("Life ❤", 100, 100, window_w, window_h, SDL_WINDOW_SHOWN);
     if (life_gui->window == NULL) {
         log_sdl_error("SDL_CreateWindow");
         destroy_life_gui(life_gui);
@@ -34,6 +34,14 @@ LifeGUI * init_life_gui(int window_width, int window_height)
         destroy_life_gui(life_gui);
         return NULL;
     }
+    
+    life_gui->viewport->x = 0;
+    life_gui->viewport->y = 0;
+    life_gui->viewport->w = 40;
+    life_gui->viewport->h = 30;
+
+    life_gui->_world_w = world_w;
+    life_gui->_world_h = world_h;
 
     return life_gui;
 }
@@ -63,6 +71,17 @@ void draw_world(LifeGUI * g, World * w)
     SDL_RenderPresent(g->renderer);
 }
 
+void move_viewport(LifeGUI * lg, int x, int y)
+{
+    if (lg->viewport->x + x >= 0 && lg->viewport->w + x <= lg->_world_w) {
+        lg->viewport->x += x;
+        lg->viewport->w += x;
+    }
+    if (lg->viewport->y + y >= 0 && lg->viewport->h + y <= lg->_world_h) {
+        lg->viewport->y += y;
+        lg->viewport->h += y;
+    }
+}
 
 void destroy_life_gui(LifeGUI * life_gui)
 {
