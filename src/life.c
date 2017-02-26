@@ -1,24 +1,9 @@
 #include "stdlib.h"
 #include "stdio.h"
+#include "stdbool.h"
 
 #include "world.h"
 #include "life_gui.h"
-
-#ifdef __MINGW32__
-#define EXIT_FUNCTION
-#include "conio.h"
-bool check_exit()
-{
-    if (kbhit() && getch() == 27) {
-        return true;
-    }
-    return false;
-}
-#endif /* __MINGW32__*/
-
-// #ifdef __linux__
-// Todo: check_exit()
-// #endif /* __linux__ */
 
 int main(int argc, char const * argv[])
 {
@@ -47,14 +32,25 @@ int main(int argc, char const * argv[])
     toggle_creature(world, 2, 2);
     draw_world(life_gui, world);
 
-    for (int i = 0; i < 300; i++) {
+    bool quit = false;
+    SDL_Event event;
+    while (!quit) {
         next_generation(world);
         draw_world(life_gui, world);
-        #ifdef EXIT_FUNCTION
-        if (check_exit()) {
-            break;
+
+        if (SDL_PollEvent(&event)) {
+            switch (event.type) {
+                case SDL_QUIT:
+                    quit = true;
+                    break;
+                case SDL_KEYDOWN:
+                    if (event.key.keysym.sym == SDLK_q) {
+                        quit = true;
+                    }
+                    break;
+            }
         }
-        #endif
+        
         SDL_Delay(100);
     }
 
