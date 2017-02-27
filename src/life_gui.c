@@ -34,7 +34,7 @@ LifeGUI * init_life_gui(int window_w, int window_h, int world_w, int world_h)
         destroy_life_gui(life_gui);
         return NULL;
     }
-    
+
     life_gui->viewport->x = 0;
     life_gui->viewport->y = 0;
     life_gui->viewport->w = 40;
@@ -59,8 +59,8 @@ void draw_world(LifeGUI * g, World * w)
                 SDL_SetRenderDrawColor(g->renderer, shade, shade, shade, 255);
             }
             SDL_Rect pos;
-            pos.x = x * 20;
-            pos.y = y * 20;
+            pos.x = (x - g->viewport->x) * 20;
+            pos.y = 600 - ((y - g->viewport->y) * 20) - 20;
             pos.w = 20;
             pos.h = 20;
             SDL_RenderFillRect(g->renderer, &pos);
