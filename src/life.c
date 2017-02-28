@@ -38,12 +38,15 @@ int main(int argc, char const * argv[])
     toggle_creature(world, 2, 2);
 
     bool quit = false;
+    bool pause = false;
     SDL_Event event;
     draw_world(life_gui, world);
     int countTime = 0;
     while (!quit) {
         if (countTime >= 200) {
-            next_generation(world);
+            if (!pause) {
+                next_generation(world);
+            }
             draw_world(life_gui, world);
             countTime -= 200;
         }
@@ -58,17 +61,38 @@ int main(int argc, char const * argv[])
                         case SDLK_q:
                             quit = true;
                             break;
-                        case SDLK_LEFT:
+                        /* Move viewport */
+                        case SDLK_a:
                             move_viewport(life_gui, -1, 0);
                             break;
-                        case SDLK_RIGHT:
+                        case SDLK_d:
                             move_viewport(life_gui, 1, 0);
                             break;
-                        case SDLK_UP:
+                        case SDLK_w:
                             move_viewport(life_gui, 0, 1);
                             break;
-                        case SDLK_DOWN:
+                        case SDLK_s:
                             move_viewport(life_gui, 0, -1);
+                            break;
+                        /* pause */
+                        case SDLK_p:
+                            pause = !pause;
+                            break;
+                        /* cursor */
+                        case SDLK_LEFT:
+                            life_gui->c_x -= 1;
+                            break;
+                        case SDLK_RIGHT:
+                            life_gui->c_x += 1;
+                            break;
+                        case SDLK_UP:
+                            life_gui->c_y += 1;
+                            break;
+                        case SDLK_DOWN:
+                            life_gui->c_y -= 1;
+                            break;
+                        case SDLK_e:
+                            toggle_creature(world, life_gui->c_x, life_gui->c_y);
                             break;
                     }
                     break;

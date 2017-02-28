@@ -20,6 +20,8 @@ typedef struct {
     SDL_Rect * viewport;
     int _world_h;
     int _world_w;
+    int c_x;
+    int c_y;
 } LifeGUI;
 
 /*
