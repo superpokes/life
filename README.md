@@ -2,7 +2,11 @@
 
 ## Controls
 WASD - move camera
+
 P - pause
+
 Arrow keys - move cursor
+
 E - toggle cell at cursor
+
 Q - quit 
