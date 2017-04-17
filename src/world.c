@@ -1,60 +1,16 @@
 #include "world.h"
 
+#include "stdbool.h"
+#include "stdio.h"
+#include "string.h"
+
+// ** PRIVATE **
+
 #define N_DIRECTIONS 8
 const char x_directions[N_DIRECTIONS] = { 0, 0, 1, 1, 1,-1,-1,-1 };
 const char y_directions[N_DIRECTIONS] = { 1,-1, 0, 1,-1, 0, 1,-1 };
 
-World * init_world(size_t width, size_t height)
-{
-    World * world = (World *) malloc(sizeof(World));
-    if (world == NULL) {
-        return NULL;
-    }
-
-    world->w = width;
-    world->h = height;
-
-    world->land = (Entity *) malloc(width * height * sizeof(Entity));
-    if (world->land == NULL) {
-        return NULL;
-    }
-
-    for (int i = 0; i < width * height; i++) {
-        world->land[i] = INANIMATE;
-    }
-
-    return world;
-}
-
-
-char get_creature(World * world, size_t x, size_t y)
-{
-    if (x >= world->w || y >= world->h) {
-        return INANIMATE;
-    } else {
-        return world->land[x + y * world->w];
-    }
-}
-
-
-void set_creature(World * world, size_t x, size_t y, char value)
-{
-    if (x < world->w && y < world->h) {
-        world->land[x + y * world->w] = value;
-    }
-}
-
-
-void toggle_creature(World * world, size_t x, size_t y)
-{
-    if (x < world->w && y < world->h) {
-        size_t mtx_i = x + (y * world->w);
-        KILL(world->land[mtx_i]);
-    }
-}
-
-
-unsigned char adjacent_sentients(World * world, size_t x, size_t y)
+uint8_t adjacent_sentients(World * world, uint32_t x, uint32_t y)
 {
     int i_x = (int) x;
     int i_y = (int) y;
@@ -71,42 +27,95 @@ unsigned char adjacent_sentients(World * world, size_t x, size_t y)
     return count_adjacent;
 }
 
+// ** END PRIVATE **
 
-int next_generation(World * world)
+World * init_world(uint32_t width, uint32_t height)
 {
-    char * next_generation_land = (char *) malloc(world->w * world->h * sizeof(char));
-    if (next_generation_land == NULL) {
-        return 1;
+    World * world = (World *) malloc(sizeof(World));
+    if (world == NULL) {
+        return NULL;
     }
 
-    for (size_t x = 0; x < world->w; x++) {
-        for (size_t y = 0; y < world->h; y++) {
-            unsigned char adjacents = adjacent_sentients(world, x, y);
+    world->w = width;
+    world->h = height;
+
+    world->land = (Entity **) malloc(width * sizeof(Entity*));
+    if (world->land == NULL) {
+        return NULL;
+    }
+
+    *(world->land) = (Entity *) malloc(width * height * sizeof(Entity));
+    if (*(world->land) == NULL) {
+        return NULL;
+    }
+
+    memset(*(world->land), INANIMATE, width * height * sizeof(Entity));
+
+    for (uint32_t i = 1; i < width; i++) {
+        world->land[i] = world->land[i - 1] + height;
+    }
+
+    return world;
+}
+
+
+Entity get_creature(World * world, uint32_t x, uint32_t y)
+{
+    if (x <= world->w && y <= world->h && x >= 1 && y >= 1) {
+        return world->land[x - 1][y - 1];
+    }
+    return INANIMATE;
+}
+
+
+void set_creature(World * world, uint32_t x, uint32_t y, Entity value)
+{
+    if (x <= world->w && y <= world->h && x >= 1 && y >= 1) {
+        world->land[x - 1][y - 1] = value;
+    }
+}
+
+
+void toggle_creature(World * world, uint32_t x, uint32_t y) {
+    Entity e = get_creature(world, x, y) == SENTIENT ? INANIMATE : SENTIENT;
+    set_creature(world, x, y, e);
+}
+
+
+World * next_generation(World * world)
+{
+    World * next_w = init_world(world->w, world->h);
+    if (next_w == NULL) {
+        return NULL;
+    }
+
+    for (uint32_t x = 1; x < world->w + 1; x++) {
+        for (uint32_t y = 1; y < world->h + 1; y++) {
+            uint8_t adjacents = adjacent_sentients(world, x, y);
             if (get_creature(world, x, y) == SENTIENT) {
                 if (adjacents == 2 || adjacents == 3) {
-                    next_generation_land[x + y * world->w] = SENTIENT;
+                    set_creature(next_w, x, y, SENTIENT);
                 } else {
-                    next_generation_land[x + y * world->w] = INANIMATE;
+                    set_creature(next_w, x, y, INANIMATE);
                 }
             } else { // == INANIMATE
                 if (adjacents == 3) {
-                    next_generation_land[x + y * world->w] = SENTIENT;
+                    set_creature(next_w, x, y, SENTIENT);
                 } else {
-                    next_generation_land[x + y * world->w] = INANIMATE;
+                    set_creature(next_w, x, y, INANIMATE);
                 }
             }
         }
     }
 
-    free(world->land);
-    world->land = next_generation_land;
-
-    return 0;
+    destruct_world(world);
+    return next_w;
 }
 
 
 void destruct_world(World * world)
 {
+    free(*(world->land));
     free(world->land);
     free(world);
 }

@@ -31,11 +31,11 @@ int main(int argc, char const * argv[])
     /*
      * test
      */
-    toggle_creature(world, 1, 0);
-    toggle_creature(world, 2, 1);
-    toggle_creature(world, 0, 2);
-    toggle_creature(world, 1, 2);
-    toggle_creature(world, 2, 2);
+    set_creature(world, 2, 1, SENTIENT);
+    set_creature(world, 3, 2, SENTIENT);
+    set_creature(world, 1, 3, SENTIENT);
+    set_creature(world, 2, 3, SENTIENT);
+    set_creature(world, 3, 3, SENTIENT);
 
     bool quit = false;
     bool pause = false;
@@ -45,7 +45,7 @@ int main(int argc, char const * argv[])
     while (!quit) {
         if (countTime >= 200) {
             if (!pause) {
-                next_generation(world);
+                world = next_generation(world);
             }
             draw_world(life_gui, world);
             countTime -= 200;
@@ -107,4 +107,20 @@ int main(int argc, char const * argv[])
     destruct_world(world);
     SDL_Quit();
     return 0;
+    // World * w = init_world(10, 5);
+    // printf("1.\n");
+    // set_creature(w, 0, 0);
+    // printf("2.\n");
+    // next_generation(w);
+    // printf("3.\n");
+    // set_creature(w, 8, 3);
+    // printf("4.\n");
+    // set_creature(w, 1, 0);
+    // set_creature(w, 2, 1);
+    // set_creature(w, 0, 2);
+    // set_creature(w, 1, 2);
+    // set_creature(w, 2, 2);
+    // printf("5.\n");
+    // next_generation(w);
+    // printf("6.\n");
 }
