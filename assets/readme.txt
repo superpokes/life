@@ -1,0 +1,1 @@
+this tileset was created by Quale, visit his blog at quale-art.blogspot.com
