@@ -2,125 +2,163 @@
 #include "stdio.h"
 #include "stdbool.h"
 
+#include "SDL.h"
+#include "GL/glew.h"
 #include "world.h"
-#include "life_gui.h"
+
+// Helpful material
+// http://lazyfoo.net/tutorials/SDL/50_SDL_and_opengl_2/
+// http://lazyfoo.net/tutorials/OpenGL/index.php
+// https://www.khronos.org/opengl/wiki/Array_Texture
+
+// global declarations, prefixed with g_
+SDL_Window * g_main_window;
+World * g_world;
+bool g_running;
+bool g_quit;
+
+// starts SDL and OpenGL
+bool init_environment() {
+    // Initialize SDL
+    // Only using video and events subsystem
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_TIMER) != 0) {
+        printf("SDL_Init error: %s\n", SDL_GetError());
+        return false;
+    }
+
+    // Using OpenGL 3.0
+    // It's required to specify a version in order to create the window (or
+    // so I was told by the internet)
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+
+    // Create SDL window
+    g_main_window = SDL_CreateWindow("Life", SDL_WINDOWPOS_CENTERED,
+        SDL_WINDOWPOS_CENTERED, 320, 320, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+    if (g_main_window == NULL) {
+        printf("SDL_CreateWindow error: %s\n", SDL_GetError());
+        return false;
+    }
+
+    // Create an OpenGL context attached to the window
+    SDL_GLContext GL_context = SDL_GL_CreateContext(g_main_window);
+    if (GL_context == NULL) {
+        printf("SDL_GL_CreateContext error: %s\n", SDL_GetError());
+        return false;
+    }
+
+    return true;
+}
+
+
+bool configure_opengl() {
+    // Used for storing OpenGL error codes
+    GLenum GL_error = GL_NO_ERROR;
+
+    // Initialize projection matrix
+    // Controls how perspective works in OpenGL
+    // We set it to the identity matrix
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    GL_error = glGetError();
+    if (GL_error != GL_NO_ERROR) {
+        printf("OpenGL initialization error: %s\n", gluErrorString(GL_error));
+        return false;
+    }
+
+    // Same thing with the model view matrix
+    // Controls how rendered objects are viewed and placed
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    GL_error = glGetError();
+    if (GL_error != GL_NO_ERROR) {
+        printf("OpenGL initialization error: %s\n", gluErrorString(GL_error));
+        return false;
+    }
+
+    // Initialize clear color to black (color used when clearing the screen)
+    glClearColor(0, 0, 0, 1);
+    GL_error = glGetError();
+    if (GL_error != GL_NO_ERROR) {
+        printf("OpenGL initialization error: %s\n", gluErrorString(GL_error));
+        return false;
+    }
+
+    return true;
+}
+
+
+void render() {
+    // Todo
+
+    // // Clear color buffer
+    // glClear(GL_COLOR_BUFFER_BIT);
+    //
+    // // Render quad in center of screen
+    // if (render_quad) {
+    //     glBegin(GL_QUADS);
+    //         glVertex2f(-0.5f, -0.5f);
+    //         glVertex2f(0.5f, -0.5f);
+    //         glVertex2f(0.5f, 0.5f);
+    //         glVertex2f(-0.5f, 0.5f);
+    //     glEnd();
+    // }
+    //
+    // SDL_GL_SwapWindow(g_main_window);
+}
+
+
+void update() {
+    // Todo
+}
+
+
+void handle_event(SDL_Event * e) {
+    // Todo
+}
+
 
 int main(int argc, char const * argv[])
 {
-    /*
-     * Hasta que no generalices un poquito mas las cosas, intenta poner world_w
-     * y world_h mayores o iguales que 40 y 30
-     */
-    int world_w = 50;
-    int world_h = 40;
-    int tilesize = 20;
+    if (!init_environment() || !configure_opengl()) {
+        return 1;
+    }
 
-    World * world = init_world(world_w, world_h);
-    if (world == NULL) {
+    // Create world (game of life logic)
+    g_world = init_world(100, 100);
+    if (g_world == NULL) {
         printf("Error: init_world.\n");
         return 1;
     }
 
-    LifeGUI * life_gui = init_life_gui(800, 600, world_w, world_h);
-    if (life_gui == NULL) {
-        printf("Error: init_life_gui.\n");
-        destroy_life_gui(life_gui);
-        return 1;
+    // Create a spaceship in a corner (for testing purposes)
+    set_creature(g_world, 2, 1, SENTIENT);
+    set_creature(g_world, 3, 2, SENTIENT);
+    set_creature(g_world, 1, 3, SENTIENT);
+    set_creature(g_world, 2, 3, SENTIENT);
+    set_creature(g_world, 3, 3, SENTIENT);
+
+    g_running = false;
+    g_quit = false;
+
+    SDL_Event * event;
+
+    while (!g_quit) {
+        if (SDL_PollEvent(event)) {
+            // handling an event at 60 fps might be too much sensitivity for
+            // things like moving the viewport and toggling a cell
+            handle_event(event);
+        }
+        // Todo: maybe only render whenever an actual update happens (won't be
+        // updating the game 60 times a second, probably)
+        update();
+        render();
+        // Todo: delay (60fps?)
     }
 
-    /*
-     * test
-     */
-    set_creature(world, 2, 1, SENTIENT);
-    set_creature(world, 3, 2, SENTIENT);
-    set_creature(world, 1, 3, SENTIENT);
-    set_creature(world, 2, 3, SENTIENT);
-    set_creature(world, 3, 3, SENTIENT);
-
-    bool quit = false;
-    bool pause = false;
-    SDL_Event event;
-    draw_world(life_gui, world);
-    int countTime = 0;
-    while (!quit) {
-        if (countTime >= 200) {
-            if (!pause) {
-                world = next_generation(world);
-            }
-            draw_world(life_gui, world);
-            countTime -= 200;
-        }
-
-        if (SDL_PollEvent(&event)) {
-            switch (event.type) {
-                case SDL_QUIT:
-                    quit = true;
-                    break;
-                case SDL_KEYDOWN:
-                    switch (event.key.keysym.sym) {
-                        case SDLK_q:
-                            quit = true;
-                            break;
-                        /* Move viewport */
-                        case SDLK_a:
-                            move_viewport(life_gui, -1, 0);
-                            break;
-                        case SDLK_d:
-                            move_viewport(life_gui, 1, 0);
-                            break;
-                        case SDLK_w:
-                            move_viewport(life_gui, 0, 1);
-                            break;
-                        case SDLK_s:
-                            move_viewport(life_gui, 0, -1);
-                            break;
-                        /* pause */
-                        case SDLK_p:
-                            pause = !pause;
-                            break;
-                        /* cursor */
-                        case SDLK_LEFT:
-                            life_gui->c_x -= 1;
-                            break;
-                        case SDLK_RIGHT:
-                            life_gui->c_x += 1;
-                            break;
-                        case SDLK_UP:
-                            life_gui->c_y += 1;
-                            break;
-                        case SDLK_DOWN:
-                            life_gui->c_y -= 1;
-                            break;
-                        case SDLK_e:
-                            toggle_creature(world, life_gui->c_x, life_gui->c_y);
-                            break;
-                    }
-                    break;
-            }
-        }
-
-        SDL_Delay(17);
-        countTime += 17;
-    }
-
-    destroy_life_gui(life_gui);
-    destruct_world(world);
+    destruct_world(g_world);
+    SDL_DestroyWindow(g_main_window);
     SDL_Quit();
+
     return 0;
-    // World * w = init_world(10, 5);
-    // printf("1.\n");
-    // set_creature(w, 0, 0);
-    // printf("2.\n");
-    // next_generation(w);
-    // printf("3.\n");
-    // set_creature(w, 8, 3);
-    // printf("4.\n");
-    // set_creature(w, 1, 0);
-    // set_creature(w, 2, 1);
-    // set_creature(w, 0, 2);
-    // set_creature(w, 1, 2);
-    // set_creature(w, 2, 2);
-    // printf("5.\n");
-    // next_generation(w);
-    // printf("6.\n");
 }
