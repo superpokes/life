@@ -3,6 +3,7 @@ project(Life)
 
 set(CMAKE_CXX_STANDARD 14)
 
+# include_directories(Life)
 FILE(GLOB_RECURSE SOURCE_FILES Life/*.cpp)
 add_executable(Life ${SOURCE_FILES} Life/glad/glad.c)
 
@@ -41,8 +42,12 @@ endif()
 
 if (MINGW)
     target_link_libraries(Life OpenGL32)
-    message(STATUS "Linked against libopengl32")
+    message(STATUS "Linked against libOpenGL32")
 else()
     target_link_libraries(Life GL)
-    message(STATUS "Linked against libgl")
+    message(STATUS "Linked against libGL")
 endif()
+
+# Test
+# add_executable(Test Life/main.cpp Life/glad/glad.c)
+# target_link_libraries(Test ${SDL2_LIBRARY} ${SOIL_LIBRARY} OpenGL32)

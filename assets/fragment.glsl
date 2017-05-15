@@ -1,15 +1,13 @@
-#version 450 core
+#version 430 core
 
 in vec2 UV;
 
 out vec3 color;
 
-//uniform sampler2DArray textureSampler;
-uniform sampler2D textureSampler;
-uniform float textureLayer;
+uniform sampler2DArray textureSampler;
+uniform int textureLayer;
 
 void main() {
-//    color = texture(textureSampler, vec3(UV, textureLayer)).rgb;
-    color = texture(textureSampler, UV).rgb;
+    color = texture(textureSampler, vec3(UV, textureLayer)).rgb;
 }
 

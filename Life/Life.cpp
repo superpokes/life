@@ -156,8 +156,11 @@ int main(int argc, char ** argv) {
         if (SDL_PollEvent(&event)) {
             HandleEvent(&event);
         }
-        Update();
-        Render();
+//        Update();
+//        Render();
+        Clear();
+        RenderAll();
+        SDL_GL_SwapWindow(g_main_window);
     }
 
 	SDL_DestroyWindow(g_main_window);

@@ -44,3 +44,4 @@ CTestTestfile.cmake
 
 # IDE-specific
 .idea
+cmake-build-debug/
