@@ -3,7 +3,7 @@
 #include <SDL2/SDL.h>
 
 #include "World.h"
-#include "Grid.h"
+#include "Renderer.h"
 
 // https://www.libsdl.org/release/SDL-1.2.15/docs/html/guidevideoopengl.html
 // http://lazyfoo.net/tutorials/SDL/50_SDL_and_opengl_2/
@@ -25,6 +25,7 @@
 // global declarations, prefixed with g_
 SDL_Window * g_main_window;
 World * g_world;
+Renderer * g_renderer;
 bool g_running;
 bool g_quit;
 
@@ -68,8 +69,10 @@ bool InitEnvironment()
 		return false;
 	}
 
+    g_renderer = new Renderer();
+
 	// Initialise the graphics module
-	if (!InitGrid()) {
+	if (!g_renderer->Fail()) {
 		printf("Error: Can't initialise grid\n");
 		SDL_DestroyWindow(g_main_window);
 		SDL_Quit();
@@ -98,7 +101,7 @@ void HandleEvent(SDL_Event * e) {
                     break;
                 // pause
                 case SDLK_p:
-//                    g_running = !g_running;
+                    g_running = !g_running;
                     break;
                 // cursor
                 case SDLK_LEFT:
@@ -123,14 +126,21 @@ void Update() {
 }
 
 void Render() {
-    Clear();
+    g_renderer->Clear();
+
+    g_renderer->PaintChar(0, 29, 17);
+    g_renderer->PaintChar(1, 29, 67);
+    g_renderer->PaintChar(2, 29, 64);
+    g_renderer->PaintChar(3, 29, 53);
+
     for (u32 i = 0; i < 40; i += 1) {
         for (u32 j = 0; j < 30; j += 1) {
             if (g_world->GetCreature(i, j) == SENTIENT) {
-                PaintTile(i, j, 50);
+                g_renderer->PaintTile(i, j, 86);
             }
         }
     }
+
     SDL_GL_SwapWindow(g_main_window);
 }
 
@@ -148,23 +158,24 @@ int main(int argc, char ** argv) {
     g_world->ToggleCreature(2, 2);
 
     g_quit = false;
-    g_running = true;
+    g_running = false;
 
     SDL_Event event;
 
+    Render();
     while (!g_quit) {
         if (SDL_PollEvent(&event)) {
             HandleEvent(&event);
         }
-//        Update();
-//        Render();
-        Clear();
-        RenderAll();
-        SDL_GL_SwapWindow(g_main_window);
+        if (g_running) {
+            Update();
+            Render();
+        }
     }
 
 	SDL_DestroyWindow(g_main_window);
 	SDL_Quit();
     delete g_world;
+    delete g_renderer;
 	return 0;
 }
