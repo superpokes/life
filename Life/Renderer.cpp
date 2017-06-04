@@ -5,7 +5,8 @@
 #include "Renderer.h"
 #include "ShaderLoader.h"
 
-const GLfloat Renderer::vertex_data[] = {
+const GLfloat Renderer::quad_vertex_data[] =
+{
         0.f, 0.f, 0.f, // vertex 1 of triangle 1
         1.f, 0.f, 0.f, // vertex 2 of triangle 1
         0.f, 1.f, 0.f, // vertex 3 of triangle 1
@@ -13,6 +14,108 @@ const GLfloat Renderer::vertex_data[] = {
         1.f, 1.f, 0.f,
         0.f, 1.f, 0.f
 };
+
+Renderer::Renderer(u32 screen_width, u32 screen_height)
+    : fail(false)
+{
+	// Load glad functions
+	if (!gladLoadGL()) {
+        printf("Can't load OpenGL functions");
+        fail = true;
+    }
+
+	// Clear color is black
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
+	// Enable depth buffer
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+
+	// Load shaders
+	program_id = LoadShaders("assets/vertex.glsl", "assets/fragment.glsl");
+    glUseProgram(program_id);
+
+	// Create VAO and set it as current
+	GLuint quad_vao_id;
+	glGenVertexArrays(1, &quad_vao_id);
+	glBindVertexArray(quad_vao_id);
+
+	// Create VBO
+	glGenBuffers(1, &quad_vbo_id);
+	glBindBuffer(GL_ARRAY_BUFFER, quad_vbo_id);
+
+	// Buffer vertices
+	glBufferData(GL_ARRAY_BUFFER, sizeof(quad_vertex_data), quad_vertex_data, GL_STATIC_DRAW);
+
+    // Matrices
+    // perspective <- ortho(left, right, bottom, top, zNear, zFar)
+    glm::mat4 perspective = glm::ortho(
+            0.f, static_cast<float>(screen_width),
+            0.f, static_cast<float>(screen_height),
+            0.1f, 100.f
+    );
+    // view <- lookAt(camera_direction, center, up_direction)
+    glm::mat4 view = glm::lookAt(glm::vec3(0.f, 0.f, 2.f), glm::vec3(0.f, 0.f, 0.f),
+            glm::vec3(0.f, 1.f, 0.f));
+
+    view_perspective_matrix = perspective * view;
+
+    MVP_uniform_id = glGetUniformLocation(program_id, "MVP");
+
+    // Textures
+    LoadTextures();
+    sampler_uniform_id = glGetUniformLocation(program_id, "textureSampler");
+    layer_uniform_id = glGetUniformLocation(program_id, "textureLayer");
+}
+
+bool Renderer::Fail() {
+    return fail;
+}
+
+void Renderer::Clear() {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
+void Renderer::PaintTile(u32 x, u32 y, u32 tex_n) {
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, quad_vbo_id);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void *) 0);
+
+    glm::mat4 model =
+            glm::translate(glm::vec3(x, y, -10.f)) * glm::scale(glm::vec3(16.f, 16.f, 1.f));
+    glUniformMatrix4fv(MVP_uniform_id, 1, GL_FALSE, glm::value_ptr(view_perspective_matrix * model));
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, tileset_id);
+    glUniform1i(sampler_uniform_id, 0);
+
+    glUniform1i(layer_uniform_id, tex_n);
+
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+
+    glDisableVertexAttribArray(0);
+}
+
+void Renderer::PaintChar(u32 x, u32 y, u32 char_n) {
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, quad_vbo_id);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void *) 0);
+
+    glm::mat4 model =
+            glm::translate(glm::vec3(x, y, -3.f)) * glm::scale(glm::vec3(8.f, 16.f, 1.f));
+    glUniformMatrix4fv(MVP_uniform_id, 1, GL_FALSE, glm::value_ptr(view_perspective_matrix * model));
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, chars_id);
+    glUniform1i(sampler_uniform_id, 0);
+
+    glUniform1i(layer_uniform_id, char_n);
+
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+
+    glDisableVertexAttribArray(0);
+}
+
 
 void Renderer::LoadTextures() {
     int width, height, channels;
@@ -79,97 +182,4 @@ void Renderer::LoadTextures() {
     free(char_data);
 
     return;
-}
-
-Renderer::Renderer() {
-	// Load glad functions
-	if (!gladLoadGL()) {
-        printf("Can't load OpenGL functions");
-        fail = true;
-    } else {
-        fail = false;
-    }
-
-	// Clear color is black
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-
-	// Enable depth buffer
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
-
-	// Load shaders
-	program_id = LoadShaders("assets/vertex.glsl", "assets/fragment.glsl");
-    glUseProgram(program_id);
-
-	// Create VAO and set it as current
-	GLuint vao_id;
-	glGenVertexArrays(1, &vao_id);
-	glBindVertexArray(vao_id);
-
-	// Create VBO
-	glGenBuffers(1, &vbo_id);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
-
-	// Buffer vertices
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data), vertex_data,
-		GL_STATIC_DRAW);
-
-    MVP_uniform_id = glGetUniformLocation(program_id, "MVP");
-
-    view_perspective_matrix = glm::ortho(0.f, 640.f, 0.f, 480.f, 0.1f, 100.f) *
-            glm::lookAt(glm::vec3(0.f, 0.f, 2.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
-
-    LoadTextures();
-
-    sampler_uniform_id = glGetUniformLocation(program_id, "textureSampler");
-
-    layer_uniform_id = glGetUniformLocation(program_id, "textureLayer");
-}
-
-void Renderer::Clear() {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-}
-
-void Renderer::PaintTile(u32 x, u32 y, u32 tex_n) {
-    glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void *) 0);
-
-    glm::mat4 model = glm::translate(glm::vec3(16 * x, 16 * y, -10.f)) *
-            glm::scale(glm::vec3(16.f, 16.f, 1.f));
-    glUniformMatrix4fv(MVP_uniform_id, 1, GL_FALSE, glm::value_ptr(view_perspective_matrix * model));
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D_ARRAY, tileset_id);
-    glUniform1i(sampler_uniform_id, 0);
-
-    glUniform1i(layer_uniform_id, tex_n);
-
-    glDrawArrays(GL_TRIANGLES, 0, 6);
-
-    glDisableVertexAttribArray(0);
-}
-
-void Renderer::PaintChar(u32 x, u32 y, u32 char_n) {
-    glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void *) 0);
-
-    glm::mat4 model = glm::translate(glm::vec3(8 * x, 16 * y, -3.)) *
-            glm::scale(glm::vec3(8.f, 16.f, 1.f));
-    glUniformMatrix4fv(MVP_uniform_id, 1, GL_FALSE, glm::value_ptr(view_perspective_matrix * model));
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D_ARRAY, chars_id);
-    glUniform1i(sampler_uniform_id, 0);
-
-    glUniform1i(layer_uniform_id, char_n);
-
-    glDrawArrays(GL_TRIANGLES, 0, 6);
-
-    glDisableVertexAttribArray(0);
-}
-
-bool Renderer::Fail() {
-    return fail;
 }

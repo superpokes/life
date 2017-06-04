@@ -32,6 +32,8 @@ bool g_quit;
 // starts SDL and OpenGL
 bool InitEnvironment()
 {
+    u32 screen_width = 640, screen_height = 480;
+
 	// Initialize SDL
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_TIMER) != 0) {
 		printf("SDL_Init error: %s\n", SDL_GetError());
@@ -40,7 +42,7 @@ bool InitEnvironment()
 
 	// Create SDL window
 	g_main_window = SDL_CreateWindow("Life", SDL_WINDOWPOS_CENTERED,
-		SDL_WINDOWPOS_CENTERED, 640, 480, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+		SDL_WINDOWPOS_CENTERED, screen_width, screen_height, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
 	if (g_main_window == NULL) {
 		printf("SDL_CreateWindow error: %s\n", SDL_GetError());
 		SDL_Quit();
@@ -69,10 +71,10 @@ bool InitEnvironment()
 		return false;
 	}
 
-    g_renderer = new Renderer();
+    // Initialise the graphics module
+    g_renderer = new Renderer(screen_width, screen_height);
 
-	// Initialise the graphics module
-	if (!g_renderer->Fail()) {
+	if (g_renderer->Fail()) {
 		printf("Error: Can't initialise grid\n");
 		SDL_DestroyWindow(g_main_window);
 		SDL_Quit();
@@ -128,15 +130,15 @@ void Update() {
 void Render() {
     g_renderer->Clear();
 
-    g_renderer->PaintChar(0, 29, 17);
-    g_renderer->PaintChar(1, 29, 67);
-    g_renderer->PaintChar(2, 29, 64);
-    g_renderer->PaintChar(3, 29, 53);
+    g_renderer->PaintChar(8 * 0, 16 * 29, 17);
+    g_renderer->PaintChar(8 * 1, 16 * 29, 67);
+    g_renderer->PaintChar(8 * 2, 16 * 29, 64);
+    g_renderer->PaintChar(8 * 3, 16 * 29, 53);
 
     for (u32 i = 0; i < 40; i += 1) {
         for (u32 j = 0; j < 30; j += 1) {
             if (g_world->GetCreature(i, j) == SENTIENT) {
-                g_renderer->PaintTile(i, j, 86);
+                g_renderer->PaintTile(16 * i, 16 * j, 86);
             }
         }
     }
