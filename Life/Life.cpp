@@ -28,6 +28,10 @@ World * g_world;
 Renderer * g_renderer;
 bool g_running;
 bool g_quit;
+int g_inverse_speed;
+int g_ticks;
+char g_bottom_string[80] =
+        "Speed: 1/4   +: Faster -: Slower P: Pause                                     ";
 
 // starts SDL and OpenGL
 bool InitEnvironment()
@@ -121,6 +125,19 @@ void HandleEvent(SDL_Event * e) {
                 // toggle
                 case SDLK_e:
                     break;
+                // timescale
+                case SDLK_KP_PLUS:
+                    if (g_inverse_speed > 1) {
+                        g_inverse_speed /= 2;
+                        sprintf(g_bottom_string + 9, "%d", g_inverse_speed);
+                    }
+                    break;
+                case SDLK_KP_MINUS:
+                    if (g_inverse_speed < 128) {
+                        g_inverse_speed *= 2;
+                        sprintf(g_bottom_string + 9, "%d", g_inverse_speed);
+                    }
+                    break;
                 default:
                     break;
             }
@@ -131,7 +148,10 @@ void HandleEvent(SDL_Event * e) {
 }
 
 void Update() {
-    g_world->NextGeneration();
+    if (g_ticks % g_inverse_speed == 0) {
+        g_world->NextGeneration();
+    }
+    g_ticks += 1;
 }
 
 void Render() {
@@ -141,10 +161,13 @@ void Render() {
 //    g_renderer->PaintChar(8 * 1, 16 * 29, 67);
 //    g_renderer->PaintChar(8 * 2, 16 * 29, 64);
 //    g_renderer->PaintChar(8 * 3, 16 * 29, 53);
+    for (u32 i = 0; i < 80; i++) {
+        g_renderer->PaintChar(8 * i, 0, static_cast<u32>(g_bottom_string[i] - ' '));
+    }
 
     for (u32 i = 0; i < 40; i += 1) {
-        for (u32 j = 0; j < 30; j += 1) {
-            if (g_world->GetCreature(30 + i, 35 + j) == SENTIENT) {
+        for (u32 j = 1; j < 30; j += 1) {
+            if (g_world->GetCreature(30 + i, 34 + j) == SENTIENT) {
                 g_renderer->PaintTile(16 * i, 16 * j, 86);
             }
         }
@@ -168,6 +191,8 @@ int main(int argc, char ** argv) {
 
     g_quit = false;
     g_running = false;
+    g_inverse_speed = 4;
+    g_ticks = 0;
 
     SDL_Event event;
 
