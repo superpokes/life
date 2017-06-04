@@ -95,3 +95,29 @@ u8 World::AdjacentSentients(s32 x, s32 y) {
 
     return count_adjacent;
 }
+
+void World::MoveFocus(s32 x, s32 y) {
+    // Move Y
+    s32 y_offset = w * y;
+    if (y_offset > 0) {
+        memcpy(land + y_offset, land, (w * h - y_offset) * sizeof(Entity));
+        memset(land, INANIMATE, y_offset * sizeof(Entity));
+    } else if (y_offset < 0) {
+        memcpy(land, land - y_offset, (w * h + y_offset) * sizeof(Entity));
+        memset(land + w * h + y_offset, INANIMATE, (-y_offset) * sizeof(Entity));
+    }
+
+    // Move X
+    size_t byteAmount = (x > 0 ? w - x : w + x) * sizeof(Entity);
+    if (x > 0) {
+        for (Entity * row = land; row < land + w * h; row += w) {
+            memcpy(row + x, row, byteAmount);
+            memset(row, INANIMATE, x * sizeof(Entity));
+        }
+    } else if (x < 0) {
+        for (Entity * row = land; row < land + w * h; row += w) {
+            memcpy(row, row - x, byteAmount);
+            memset(row + w + x, INANIMATE, (-x) * sizeof(Entity));
+        }
+    }
+}

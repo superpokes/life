@@ -95,11 +95,18 @@ void HandleEvent(SDL_Event * e) {
                 case SDLK_ESCAPE:
                     g_quit = true;
                     break;
-                // Move viewport
+                // Move world / the window of the world we see
                 case SDLK_a:
+                    g_world->MoveFocus(-1, 0);
+                    break;
                 case SDLK_d:
+                    g_world->MoveFocus(1, 0);
+                    break;
                 case SDLK_w:
+                    g_world->MoveFocus(0, 1);
+                    break;
                 case SDLK_s:
+                    g_world->MoveFocus(0, -1);
                     break;
                 // pause
                 case SDLK_p:
@@ -130,14 +137,14 @@ void Update() {
 void Render() {
     g_renderer->Clear();
 
-    g_renderer->PaintChar(8 * 0, 16 * 29, 17);
-    g_renderer->PaintChar(8 * 1, 16 * 29, 67);
-    g_renderer->PaintChar(8 * 2, 16 * 29, 64);
-    g_renderer->PaintChar(8 * 3, 16 * 29, 53);
+//    g_renderer->PaintChar(8 * 0, 16 * 29, 17);
+//    g_renderer->PaintChar(8 * 1, 16 * 29, 67);
+//    g_renderer->PaintChar(8 * 2, 16 * 29, 64);
+//    g_renderer->PaintChar(8 * 3, 16 * 29, 53);
 
     for (u32 i = 0; i < 40; i += 1) {
         for (u32 j = 0; j < 30; j += 1) {
-            if (g_world->GetCreature(i, j) == SENTIENT) {
+            if (g_world->GetCreature(30 + i, 35 + j) == SENTIENT) {
                 g_renderer->PaintTile(16 * i, 16 * j, 86);
             }
         }
@@ -151,13 +158,13 @@ int main(int argc, char ** argv) {
 		return 1;
 	}
 
-    g_world = new World(40, 30);
+    g_world = new World(100, 100);
 
-    g_world->ToggleCreature(1, 0);
-    g_world->ToggleCreature(2, 1);
-    g_world->ToggleCreature(0, 2);
-    g_world->ToggleCreature(1, 2);
-    g_world->ToggleCreature(2, 2);
+    g_world->ToggleCreature(31, 35);
+    g_world->ToggleCreature(32, 36);
+    g_world->ToggleCreature(30, 37);
+    g_world->ToggleCreature(31, 37);
+    g_world->ToggleCreature(32, 37);
 
     g_quit = false;
     g_running = false;
@@ -171,8 +178,8 @@ int main(int argc, char ** argv) {
         }
         if (g_running) {
             Update();
-            Render();
         }
+        Render();
     }
 
 	SDL_DestroyWindow(g_main_window);

@@ -19,6 +19,7 @@ public:
 	// fuck them up. useless if out of bounds.
 	void ToggleCreature(s32 x, s32 y);
 	void NextGeneration();
+	void MoveFocus(s32 x, s32 y);
 private:
 	u32 w;
 	u32 h;
