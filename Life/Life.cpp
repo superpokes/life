@@ -32,7 +32,7 @@ bool g_on_menu;
 int g_inverse_speed;
 int g_ticks;
 char g_bottom_string[80] =
-        "Speed: 1/4   +: Faster -: Slower P: Pause                                     ";
+        "Speed: 1/4                                                                    ";
 u32 g_cursor_pos_x;
 u32 g_cursor_pos_y;
 
@@ -105,20 +105,30 @@ void HandleEvent(SDL_Event * e) {
                     break;
                 // Move world / the window of the world we see
                 case SDLK_a:
-                    g_world->MoveFocus(-1, 0);
+                    if (!g_on_menu) {
+                        g_world->MoveFocus(-1, 0);
+                    }
                     break;
                 case SDLK_d:
-                    g_world->MoveFocus(1, 0);
+                    if (!g_on_menu) {
+                        g_world->MoveFocus(1, 0);
+                    }
                     break;
                 case SDLK_w:
-                    g_world->MoveFocus(0, 1);
+                    if (!g_on_menu) {
+                        g_world->MoveFocus(0, 1);
+                    }
                     break;
                 case SDLK_s:
-                    g_world->MoveFocus(0, -1);
+                    if (!g_on_menu) {
+                        g_world->MoveFocus(0, -1);
+                    }
                     break;
                 // pause
                 case SDLK_p:
-                    g_running = !g_running;
+                    if (!g_on_menu) {
+                        g_running = !g_running;
+                    }
                     break;
                 // menu
                 case SDLK_m:
@@ -126,28 +136,30 @@ void HandleEvent(SDL_Event * e) {
                     break;
                 // cursor
                 case SDLK_LEFT:
-                    if (g_cursor_pos_x > 0) {
+                    if (!g_on_menu && g_cursor_pos_x > 0) {
                         g_cursor_pos_x -= 1;
                     }
                     break;
                 case SDLK_RIGHT:
-                    if (g_cursor_pos_x < 39) {
+                    if (!g_on_menu && g_cursor_pos_x < 39) {
                         g_cursor_pos_x += 1;
                     }
                     break;
                 case SDLK_UP:
-                    if (g_cursor_pos_y < 29) {
+                    if (!g_on_menu && g_cursor_pos_y < 29) {
                         g_cursor_pos_y += 1;
                     }
                     break;
                 case SDLK_DOWN:
-                    if (g_cursor_pos_y > 1) {
+                    if (!g_on_menu && g_cursor_pos_y > 1) {
                         g_cursor_pos_y -= 1;
                     }
                     break;
                 // toggle
                 case SDLK_e:
-                    g_world->ToggleCreature(30 + g_cursor_pos_x, 34 + g_cursor_pos_y);
+                    if (!g_on_menu) {
+                        g_world->ToggleCreature(30 + g_cursor_pos_x, 34 + g_cursor_pos_y);
+                    }
                     break;
                 // timescale
                 case SDLK_KP_PLUS:
@@ -266,7 +278,7 @@ int main(int argc, char ** argv) {
         if (SDL_PollEvent(&event)) {
             HandleEvent(&event);
         }
-        if (g_running) {
+        if (g_running && !g_on_menu) {
             Update();
         }
         Render();
