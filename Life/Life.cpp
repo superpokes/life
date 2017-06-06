@@ -32,6 +32,8 @@ int g_inverse_speed;
 int g_ticks;
 char g_bottom_string[80] =
         "Speed: 1/4   +: Faster -: Slower P: Pause                                     ";
+u32 g_cursor_pos_x;
+u32 g_cursor_pos_y;
 
 // starts SDL and OpenGL
 bool InitEnvironment()
@@ -119,9 +121,24 @@ void HandleEvent(SDL_Event * e) {
                     break;
                 // cursor
                 case SDLK_LEFT:
+                    if (g_cursor_pos_x > 0) {
+                        g_cursor_pos_x -= 1;
+                    }
+                    break;
                 case SDLK_RIGHT:
+                    if (g_cursor_pos_x < 39) {
+                        g_cursor_pos_x += 1;
+                    }
+                    break;
                 case SDLK_UP:
+                    if (g_cursor_pos_y < 29) {
+                        g_cursor_pos_y += 1;
+                    }
+                    break;
                 case SDLK_DOWN:
+                    if (g_cursor_pos_y > 1) {
+                        g_cursor_pos_y -= 1;
+                    }
                     break;
                 // toggle
                 case SDLK_e:
@@ -168,7 +185,9 @@ void Render() {
 
     for (u32 i = 0; i < 40; i += 1) {
         for (u32 j = 1; j < 30; j += 1) {
-            if (g_world->GetCreature(30 + i, 34 + j) == SENTIENT) {
+            if (g_cursor_pos_x == i && g_cursor_pos_y == j) {
+                g_renderer->PaintTile(16 * i, 16 * j, 233);
+            } else if (g_world->GetCreature(30 + i, 34 + j) == SENTIENT) {
                 g_renderer->PaintTile(16 * i, 16 * j, 86);
             }
         }
@@ -194,6 +213,8 @@ int main(int argc, char ** argv) {
     g_running = false;
     g_inverse_speed = 4;
     g_ticks = 0;
+    g_cursor_pos_x = 19;
+    g_cursor_pos_y = 14;
 
     SDL_Event event;
 
