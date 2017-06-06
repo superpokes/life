@@ -28,6 +28,7 @@ World * g_world;
 Renderer * g_renderer;
 bool g_running;
 bool g_quit;
+bool g_on_menu;
 int g_inverse_speed;
 int g_ticks;
 char g_bottom_string[80] =
@@ -119,6 +120,10 @@ void HandleEvent(SDL_Event * e) {
                 case SDLK_p:
                     g_running = !g_running;
                     break;
+                // menu
+                case SDLK_m:
+                    g_on_menu = !g_on_menu;
+                    break;
                 // cursor
                 case SDLK_LEFT:
                     if (g_cursor_pos_x > 0) {
@@ -173,6 +178,12 @@ void Update() {
     g_ticks += 1;
 }
 
+void RenderString(const char * render_str, const u32 str_size, const u32 x_pos, const u32 y_pos) {
+    for (u32 i = 0; i < str_size; i++) {
+        g_renderer->PaintChar(8 * (i + x_pos), 16 * y_pos, render_str[i] - ' ');
+    }
+}
+
 void Render() {
     g_renderer->Clear();
 
@@ -180,8 +191,37 @@ void Render() {
 //    g_renderer->PaintChar(8 * 1, 16 * 29, 67);
 //    g_renderer->PaintChar(8 * 2, 16 * 29, 64);
 //    g_renderer->PaintChar(8 * 3, 16 * 29, 53);
-    for (u32 i = 0; i < 80; i++) {
-        g_renderer->PaintChar(8 * i, 0, static_cast<u32>(g_bottom_string[i] - ' '));
+    RenderString(g_bottom_string, 80, 0, 0);
+
+    if (g_on_menu) {
+        // Render menu box
+        g_renderer->PaintTile(16 * 5, 16 * 5, 106);
+        g_renderer->PaintTile(16 * 34, 16 * 5, 107);
+        g_renderer->PaintTile(16 * 5, 16 * 25, 104);
+        g_renderer->PaintTile(16 * 34, 16 * 25, 105);
+        for (u32 i = 5; i < 35; i++) {
+            g_renderer->PaintTile(16 * i, 16 * 5, 101);
+            g_renderer->PaintTile(16 * i, 16 * 25, 101);
+        }
+        for (u32 j = 6; j < 25; j++) {
+            g_renderer->PaintTile(16 * 5, 16 * j, 102);
+            g_renderer->PaintTile(16 * 34, 16 * j, 102);
+        }
+        for (u32 i = 6; i < 34; i++) {
+            for (u32 j = 6; j < 25; j++) {
+                g_renderer->PaintTile(16 * i, 16 * j, 252);
+            }
+        }
+        // Render text
+        RenderString("Life", 4, 38, 24);
+        RenderString("Controls:", 9, 18, 23);
+        RenderString("WASD: Camera control", 20, 22, 22);
+        RenderString("wwww: Cursor movement", 21, 22, 21);
+        RenderString("E: Toggle creature", 18, 22, 20);
+        RenderString("P: Pause", 8, 22, 19);
+        RenderString("+/-: Faster/slower simulation", 28, 22, 18);
+        RenderString("M: Open/close menu", 18, 22, 17);
+        RenderString("ESC: Close game", 15, 22, 16);
     }
 
     for (u32 i = 0; i < 40; i += 1) {
@@ -213,6 +253,7 @@ int main(int argc, char ** argv) {
 
     g_quit = false;
     g_running = false;
+    g_on_menu = false;
     g_inverse_speed = 4;
     g_ticks = 0;
     g_cursor_pos_x = 19;
