@@ -1,2 +1,2 @@
 # <div align="center"><span style="color:red; font-size:200pt">❤</span></div>
-![Demonstration of the program](https://raw.githubusercontent.com/superpokes/life/master/promo.gif)
+<div align="center"><img src="https://raw.githubusercontent.com/superpokes/life/master/promo.gif" alt="Demonstration of the program"></div>
