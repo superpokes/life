@@ -68,6 +68,7 @@ bool InitEnvironment()
 	}
 
 	// Enable VSync
+  // Bug: Doesn't work on my linux for some reason
 	if (SDL_GL_SetSwapInterval(1) != 0) {
 		printf("Error: can't enable vsync, SDL: %s\n", SDL_GetError());
 		SDL_DestroyWindow(g_main_window);
@@ -205,6 +206,11 @@ int main(int argc, char ** argv) {
             Update();
         }
         Render();
+        // Hack: For some reason SDL_GL_SetSwapInterval doesn't work on my
+        // linux laptop
+        #if __linux__
+        SDL_Delay(17);
+        #endif
     }
 
 	SDL_DestroyWindow(g_main_window);

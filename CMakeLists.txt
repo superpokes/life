@@ -46,6 +46,8 @@ if (MINGW)
 else()
     target_link_libraries(Life GL)
     message(STATUS "Linked against libGL")
+    target_link_libraries(Life dl)
+    message(STATUS "Linked against libdl")
 endif()
 
 # Test
