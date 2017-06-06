@@ -26,7 +26,7 @@ bool g_on_menu;
 int g_inverse_speed;
 int g_ticks;
 char g_bottom_string[80] =
-        "Speed: 1/4                                                                    ";
+        "Speed: 1/4     Menu: M                                                        ";
 u32 g_cursor_pos_x;
 u32 g_cursor_pos_y;
 
