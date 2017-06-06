@@ -2,7 +2,7 @@
 
 #include "Types.h"
 
-typedef enum { SENTIENT, INANIMATE } Entity;
+enum Entity : unsigned char { SENTIENT, INANIMATE };
 
 // ⴲ
 class World {
