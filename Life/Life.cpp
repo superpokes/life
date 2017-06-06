@@ -14,13 +14,7 @@
 // https://bcmpinc.wordpress.com/2015/08/18/creating-an-opengl-4-5-context-using-sdl2-and-glad/
 
 
-// Todo: Use EXT_Texture_Array
 // Todo: Check tutorial particle thing, there might be something cool for rendering a lot of the same mesh
-// Todo: Implement camera movement and increase world size
-// Todo: Pause function
-// Todo: Timescale control
-// Todo: Show controls ingame
-// Todo: Port project to Linux
 
 // global declarations, prefixed with g_
 SDL_Window * g_main_window;
