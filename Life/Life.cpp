@@ -142,6 +142,7 @@ void HandleEvent(SDL_Event * e) {
                     break;
                 // toggle
                 case SDLK_e:
+                    g_world->ToggleCreature(30 + g_cursor_pos_x, 34 + g_cursor_pos_y);
                     break;
                 // timescale
                 case SDLK_KP_PLUS:
@@ -187,6 +188,7 @@ void Render() {
         for (u32 j = 1; j < 30; j += 1) {
             if (g_cursor_pos_x == i && g_cursor_pos_y == j) {
                 g_renderer->PaintTile(16 * i, 16 * j, 233);
+            // Volatile: The GetCreature call needs to change if World size is changed from 100
             } else if (g_world->GetCreature(30 + i, 34 + j) == SENTIENT) {
                 g_renderer->PaintTile(16 * i, 16 * j, 86);
             }
